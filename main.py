@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import openai
 from openai import OpenAI
-from PYPDF2 import PdfReader
+from PyPDF2 import PdfReader
 import chromadb
 from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 from chromadb.config import Settings

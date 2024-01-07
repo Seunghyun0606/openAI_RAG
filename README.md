@@ -4,7 +4,8 @@ Only use openai api to make RAG
 - Chroma DB, Open AI만을 활용한 기본적인 RAG 프로젝트입니다.
 - sample 문서를 입력하여, 필요한 RAG 를 테스트해보세요
 
-
+## 실행결과
+![Alt text](image.png)
 
 ## Installation
 
