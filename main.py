@@ -138,6 +138,13 @@ def get_retriever_message(vectorstore, question):
     return add_message("system", template_prompt)
 
 
+def get_response_from_openAI(chat_memory):
+    client = OpenAI()
+    return client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=chat_memory
+    )
+
 def main():
 
     # Embedding 할 path 선택
@@ -162,12 +169,21 @@ def main():
     while True:
         
         user_input = input("User: ")
-        # conversation Chain을 생성해서 응답 생성
+        # Retriever를 위한 prompt 생성
         retriever_momory = get_retriever_message(vectorstore, user_input)
         chat_memory.append(retriever_momory)
         user_memory = add_message("user", user_input)
         chat_memory.append(user_memory)
 
+        # Retriever prompt 및 Question 전달
+        response = get_response_from_openAI(chat_memory)
+        chatbot_response = response.choices[0].message.content
+
+        print("Chatbot response: " + chatbot_response)
+
+        # assistant 대화 이력 업데이트
+        chatbot_message = add_message("assistant", chatbot_response)
+        chat_memory.append(chatbot_message)
 
 if __name__ == '__main__':
     main()
