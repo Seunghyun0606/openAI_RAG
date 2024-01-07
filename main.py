@@ -106,6 +106,38 @@ def get_vectorstore(text_chunks, collection_name):
 
     return collection
 
+
+def add_message(role, content):
+    return { "role": role, "content":content }
+
+def get_retriever_message(vectorstore, question):
+    query_text = []
+    query_text.append(question)
+    retrieved_information = vectorstore.query(
+        query_texts= query_text,
+        n_results = 1
+    )
+
+    question = question
+
+    template_prompt = f'''
+        You are an intelligent assistant helping the users with their questions on the collection data. Strictly Use ONLY the following pieces of context to answer the question at the end. Think step-by-step and then answer.
+        
+        Do not try to make up an answer:
+        - If the answer to the question cannot be determined from the context alone, say "I cannot determine the answer to that."
+        - If the context is empty, just say "I do not know the answer to that."
+        
+        CONTEXT:
+        {retrieved_information}
+        
+        QUESTION:
+        {question}
+    
+        Helpful Answer:
+    '''
+    return add_message("system", template_prompt)
+
+
 def main():
 
     # Embedding 할 path 선택
@@ -119,9 +151,22 @@ def main():
     # 문서 Embedding을 위한 Chunk 준비
     text_chunks = get_text_chunks(raw_text)
 
-    # # Embedding 시작하기
+    # Embedding 시작하기
     collection_name = "my_document"
     vectorstore = get_vectorstore(text_chunks, collection_name)
+
+    # Chat conversation을 저장하기 위하여 memory 지정
+    chat_memory = []
+
+    # User Input을 받아서 대화를 생성
+    while True:
+        
+        user_input = input("User: ")
+        # conversation Chain을 생성해서 응답 생성
+        retriever_momory = get_retriever_message(vectorstore, user_input)
+        chat_memory.append(retriever_momory)
+        user_memory = add_message("user", user_input)
+        chat_memory.append(user_memory)
 
 
 if __name__ == '__main__':
